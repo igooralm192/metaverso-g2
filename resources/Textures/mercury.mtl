@@ -1,0 +1,13 @@
+# Blender MTL File: 'solar.blend'
+# Material Count: 1
+
+newmtl Material.011
+Ns 141.890153
+Ka 0.198529 0.198529 0.198529
+Kd 0.800000 0.800000 0.800000
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 0.955882
+illum 6
+map_Kd mercurymap.jpg
