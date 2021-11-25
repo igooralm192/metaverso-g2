@@ -10,6 +10,7 @@ var cameraControl;
 
 var terraData = getPlanetData(365.2564, 0.024, 1500*2, "Terra", "../resources/Textures/earthmap1k.jpg", 100, 48);
 var solData = getPlanetData(0, 0.0009, 0, "Sol", "../resources/Textures/sunmap.jpg", 500, 48);
+var luaData = getPlanetData(29.7, 0.052, 1000/3.85, "Lua", "../resources/Textures/moonmap1k.jpg", 30, 48 )
 
 var planets = [];
 
@@ -71,7 +72,8 @@ function update(cameraControl) {
 	planets.forEach(element => {
 		movePlanet(element, time);
 	});
-    
+	var lua = scene.getObjectByName("Lua");
+    moveMoon(lua, luaData, time);
     renderer.render(scene, camera);
     requestAnimationFrame(function () {
         update(cameraControl);
@@ -88,6 +90,12 @@ function movePlanet(myPlanet, myTime) {
 			* (1.0 / (myPlanet[1].orbitRate * 200)) + 10.0) 
 			* myPlanet[1].distanceFromAxis;
 	}	
+}
+
+function moveMoon(satelite, planeta, sateliteData, myTime){
+	satelite.position.x = Math.cos(myTime * (1.0/(sateliteData.orbitRate * 15 )) + 15.0) * sateliteData.distanceFromAxis
+	satelite.position.z = Math.sin(myTime * (1.0/(sateliteData.orbitRate * 15 )) + 15.0) * sateliteData.distanceFromAxis
+	angleMoonEarth();
 }
 
 function loadMesh(planetData) {
@@ -129,6 +137,15 @@ function loadMesh(planetData) {
 		let sprite = new THREE.Sprite(spriteMaterial);
 		sprite.scale.set(1800, 1800, 1.0);
 		planet.add(sprite);
+	} else{
+		texture = textureLoader.load(luaData.texture, function ( texture ) {
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+		});
+		var moon = new THREE.Mesh(new THREE.SphereGeometry(luaData.size, luaData.size, luaData.size), new THREE.MeshPhongMaterial({map: texture}))
+		moon.position.set(luaData.distanceFromAxis, 22.741, 0)
+		moon.name = luaData.name
+		console.log(moon)
+		planet.add(moon)
 	}
 	var data = [planet, planetData];
 	planets.push(data);
@@ -137,5 +154,19 @@ function loadMesh(planetData) {
 	renderer.clear();
 }
 
+function angleMoonEarth(){
+	var y = 0;
+	var terra = scene.getObjectByName("Terra")
+	var lua = scene.getObjectByName("Lua")
+
+	var terrap = Math.pow(terra.position.x, 2) + Math.pow(terra.position.y, 2) + Math.pow(terra.position.z, 2)
+	var luap = Math.pow(lua.position.x, 2) + Math.pow(lua.position.y, 2) + Math.pow(lua.position.z, 2)
+	var a = Math.acos(
+		(lua.position.x * terra.position.x + 
+			lua.position.y * terra.position.y + 
+			lua.position.z * terra.position.z) 
+		/ (Math.sqrt(terrap) * Math.sqrt(luap)));
+ 	console.log(a);
+}
 
 main();
