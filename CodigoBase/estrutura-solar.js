@@ -9,7 +9,7 @@ var camera;
 var cameraControl;
 
 var terraData = getPlanetData(365.2564, 0.024, 1500*2, "Terra", "../resources/Textures/earthmap1k.jpg", 100, 48);
-var solData = getPlanetData(0, 0.0009, 0, "Sol", "../resources/Textures/sunmap.jpg", 500, 48);
+var solData = getPlanetData(0, 0.0009, 0, "Sol", "../resources/Images/sunmap.jpg", 500, 48);
 var luaData = getPlanetData(29.7, 0.052, 1000/3.85, "Lua", "../resources/Textures/moonmap1k.jpg", 30, 48 )
 
 var planets = [];
@@ -43,23 +43,6 @@ function main() {
 	camera.lookAt(scene.position);
 
 	cameraControl = new OrbitControls(camera, renderer.domElement);
-
-	const ptLight 			= new THREE.PointLight( 0xffdcb4, 2 );
-	ptLight.name 			= "pntLight";
-	ptLight.position.set( 0, 0, 0);
-	ptLight.visible 		= true;
-	scene.add( ptLight );
-
-	const ptLightHelper 	= new THREE.PointLightHelper( ptLight, 4.0 );
-	ptLightHelper.name 		= "pntLightHlpr";
-	ptLightHelper.visible 	= true;
-	scene.add( ptLightHelper );
-
-	const ambLight 			= new THREE.AmbientLight( 0xFFFFFF, 0.5 ); 
-	ambLight.name 			= "ambLight";
-	ambLight.visible 		= true;
-
-	scene.add( ambLight );
 	loadMesh(solData);
 	loadMesh(terraData);
 	update(cameraControl);
@@ -92,7 +75,7 @@ function movePlanet(myPlanet, myTime) {
 	}	
 }
 
-function moveMoon(satelite, planeta, sateliteData, myTime){
+function moveMoon(satelite, sateliteData, myTime){
 	satelite.position.x = Math.cos(myTime * (1.0/(sateliteData.orbitRate * 15 )) + 15.0) * sateliteData.distanceFromAxis
 	satelite.position.z = Math.sin(myTime * (1.0/(sateliteData.orbitRate * 15 )) + 15.0) * sateliteData.distanceFromAxis
 	angleMoonEarth();
@@ -110,8 +93,14 @@ function loadMesh(planetData) {
 	if(planetData.name == "Sol") {
 		material = new THREE.MeshPhongMaterial({	
 			map: texture,
-			color: '0xffffff'
+            lightMap: texture,
+            transparent: true,
+            opacity: 0.8,
+            shading: THREE.SmoothShading
 		});
+		texture.wrapS = THREE.ClampToEdgeWrapping;
+    	texture.wrapT = THREE.ClampToEdgeWrapping;
+    	texture.minFilter = THREE.NearestFilter;
 	}
 	else {
 		material = new THREE.MeshPhongMaterial({	
@@ -134,18 +123,22 @@ function loadMesh(planetData) {
 				transparent: true,
 				blending: THREE.AdditiveBlending
 			});
+		const sunLight = new THREE.PointLight(0xffdcb4, 2.0);
 		let sprite = new THREE.Sprite(spriteMaterial);
 		sprite.scale.set(1800, 1800, 1.0);
+		planet.add(sunLight);
 		planet.add(sprite);
 	} else{
+		console.log(luaData.distanceFromAxis);
 		texture = textureLoader.load(luaData.texture, function ( texture ) {
 			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 		});
-		var moon = new THREE.Mesh(new THREE.SphereGeometry(luaData.size, luaData.size, luaData.size), new THREE.MeshPhongMaterial({map: texture}))
-		moon.position.set(luaData.distanceFromAxis, 22.741, 0)
-		moon.name = luaData.name
-		console.log(moon)
-		planet.add(moon)
+		var moon = new THREE.Mesh(new THREE.SphereGeometry(luaData.size, luaData.size, luaData.size), new THREE.MeshPhongMaterial({map: texture}));
+		moon.position.set(luaData.distanceFromAxis, 22.741, planet.position.z);
+		moon.name = luaData.name;
+		
+		planet.add(moon);
+		console.log(planet);
 	}
 	var data = [planet, planetData];
 	planets.push(data);
@@ -166,7 +159,7 @@ function angleMoonEarth(){
 			lua.position.y * terra.position.y + 
 			lua.position.z * terra.position.z) 
 		/ (Math.sqrt(terrap) * Math.sqrt(luap)));
- 	console.log(a);
+ 	//console.log(a);
 }
 
 main();
