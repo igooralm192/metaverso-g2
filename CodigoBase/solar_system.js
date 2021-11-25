@@ -1,5 +1,4 @@
 import * as THREE from '../resources/threejs/build/three.module.js';
-
 import { OrbitControls } from '../resources/threejs/examples/jsm/controls/OrbitControls.js';
 
 let camera, controls, renderer, raycaster;
@@ -32,30 +31,28 @@ function init() {
     camera.position.set(400, 200, 0);
 
     createControls();
-
-    /* Esse código gera o cubo para testar a iluminação, pode retirar */
-    const mat = new THREE.MeshPhongMaterial({
-        color: '0x000000'
-    })
-
-    const geometry = new THREE.BoxGeometry(7, 7, 7)
-
-    const mesh = new THREE.Mesh(geometry, mat)
-    mesh.name = "testmesh"
-
-    mesh.position.set(0, 30, 50)
-
-    scene.add(mesh)
-
-    /****************************************************/
-
     generateSun();
-
-    const ambientLight = new THREE.AmbientLight(0x222222);
-    scene.add(ambientLight);
+    createTestCube();
 
     window.addEventListener('resize', onWindowResize);
     window.addEventListener('mousemove', onMouseMove, false);
+}
+
+
+function createTestCube() {
+    const cubeMat = new THREE.MeshLambertMaterial({
+        color: '0xffffff'
+    });
+
+    const cubeGeo = new THREE.SphereGeometry(8, 12, 12);
+
+    const cube = new THREE.Mesh(cubeGeo, cubeMat);
+
+    cube.position.set(-300, 0, 0);
+    cube.name = "cube";
+    var sun = scene.getObjectByName("sun");
+    sun.add(cube);
+
 }
 
 function createControls() {
@@ -76,9 +73,19 @@ function createControls() {
 }
 
 function generateSun() {
-    const sunMaterial = new THREE.MeshBasicMaterial(
+    const texture = new THREE.TextureLoader().load("../resources/Images/sunmap.jpg");
+
+    texture.wrapS = THREE.ClampToEdgeWrapping;
+    texture.wrapT = THREE.ClampToEdgeWrapping;
+    texture.minFilter = THREE.NearestFilter;
+
+    const sunMaterial = new THREE.MeshPhongMaterial(
         {
-            color: '0xffffff'
+            map: texture,
+            lightMap: texture,
+            transparent: true,
+            opacity: 0.8,
+            shading: THREE.SmoothShading
         }
     );
 
@@ -119,13 +126,12 @@ function onWindowResize() {
 
 function animate(time) {
 
-    const sunRot = 0.005
+    const sunRot = 0.005;
+    const cubeRot = 0.05;
 
-    var obj
-
-    obj = scene.getObjectByName("sun")
-
-    obj.rotateY(sunRot)
+    var obj;
+    obj = scene.getObjectByName("sun");
+    obj.rotateY(sunRot);
 
     requestAnimationFrame(animate);
 
