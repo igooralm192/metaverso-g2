@@ -2,6 +2,8 @@
 
 import * as THREE 			from '../resources/threejs/build/three.module.js';
 import { OrbitControls }	from '../resources/threejs/examples/jsm/controls/OrbitControls.js';
+import { GLTFLoader }   from '../resources/threejs/examples/jsm/loaders/GLTFLoader.js';
+import { DRACOLoader }  from '../resources/threejs/examples/jsm/loaders/DRACOLoader.js';
 
 var renderer;
 var scene;
@@ -59,6 +61,7 @@ function main() {
 	loadMesh(solData);
 	loadMesh(terraData);
 	loadMesh(luaData)
+	loadEarth();
 	update(cameraControl);
 	var terra = scene.getObjectByName("Terra");
 	moveCamera(terra)
@@ -129,6 +132,38 @@ function movePlanet(myPlanet, myTime) {
         }
 }
 
+function loadEarth() {
+	const textureLoader = new THREE.TextureLoader();
+	const gltfLoader = new GLTFLoader();
+	const dracoLoader = new DRACOLoader();
+	const earthSceneUrl = '../resources/GLTF/earth/scene.gltf';
+
+	dracoLoader.setDecoderPath('../resources/threejs/examples/js/libs/draco');
+	gltfLoader.setDRACOLoader(dracoLoader);
+
+
+	gltfLoader.load(earthSceneUrl, (gltf) => {
+		const root = gltf.scene;
+
+		root.name = "Earth"
+		root.position.set(terraData.myDistanceFromAxis, 0, 0);
+		root.scale.set(500, 500, 500);
+
+		var texture = textureLoader.load("../resources/Textures/moonmap1k.jpg", function ( texture ) {
+			texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+		}, undefined, function(err) {
+			console.error("Erro ao carregar textura da lua.");
+		});
+
+		var data = [root, terraData];
+		planets.push(data);
+
+		scene.add(root);
+	}, undefined, function(error) {
+		console.log("Erro ao carregar modelo da terra")
+	});
+}
+
 function loadMesh(planetData) {
 
 	var textureLoader 	= new THREE.TextureLoader();
@@ -150,13 +185,13 @@ function loadMesh(planetData) {
     	texture.wrapT = THREE.ClampToEdgeWrapping;
     	texture.minFilter = THREE.NearestFilter;
 	}
-	else if (planetData.name == "Terra"){
-		material = new THREE.MeshLambertMaterial({	
-			map: texture
-		});
-	} else{
-		material = new THREE.MeshPhongMaterial({map: texture})
-	}
+	// else if (planetData.name == "Terra"){
+	// 	material = new THREE.MeshLambertMaterial({	
+	// 		map: texture
+	// 	});
+	// } else{
+	// 	material = new THREE.MeshPhongMaterial({map: texture})
+	// }
 
 	const geometry = new THREE.SphereGeometry( planetData.size, planetData.size, planetData.size );
 	var planet = new THREE.Mesh( geometry, material );
@@ -164,33 +199,23 @@ function loadMesh(planetData) {
 	planet.castShadow = false;
 	planet.name = planetData.name;
 
-	if(planet.name == "Sol") {
-		let spriteMaterial = new THREE.SpriteMaterial(
-			{
-				map: new THREE.ImageUtils.loadTexture("../resources/Images/glow.png"),
-				color: 0xffffee,
-				transparent: true,
-				blending: THREE.AdditiveBlending
-			});
+	if(planet.name == "Sol") {	
 		const sunLight = new THREE.PointLight(0xffdcb4, 2.0);
-		let sprite = new THREE.Sprite(spriteMaterial);
-		sprite.scale.set(1800, 1800, 1.0);
 		planet.position.set(planetData.distanceFromAxis, 0, 0);
 		planet.add(sunLight);
-		planet.add(sprite);
-	} else if (planet.name == "Terra"){
-		planet.position.set(0, 0, 0);
-		planet.rotation.set(0, 0.453786, 0)
-		const axis = new THREE.AxesHelper(1000 );
-		planet.add(axis)
-		console.log(planet);
-	}else if (planet.name == "Lua"){
-		var terra = scene.getObjectByName("Terra");
-		planet.position.set(luaData.distanceFromAxis,0, 0);
-		planet.name = luaData.name;
-		const axii = new THREE.AxesHelper(1000);
-		planet.add(axii)
-	}
+	} //else if (planet.name == "Terra"){
+	// 	planet.position.set(0, 0, 0);
+	// 	planet.rotation.set(0, 0.453786, 0)
+	// 	const axis = new THREE.AxesHelper(1000 );
+	// 	planet.add(axis)
+	// 	console.log(planet);
+	// }else if (planet.name == "Lua"){
+	// 	var terra = scene.getObjectByName("Terra");
+	// 	planet.position.set(luaData.distanceFromAxis,0, 0);
+	// 	planet.name = luaData.name;
+	// 	const axii = new THREE.AxesHelper(1000);
+	// 	planet.add(axii)
+	// }
 	var data = [planet, planetData];
 	planets.push(data);
 	scene.add( planet );
