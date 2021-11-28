@@ -7,15 +7,25 @@ var renderer;
 var scene;
 var camera;
 var cameraControl;
-var speedPause = 1
-var speedFactor = 0.005 * speedPause
+var speedFactor = 0.005
 var distanceFactor = 0.005
 
-var terraData = getPlanetData(0 * speedFactor, 1 * speedFactor, 200*2, "Terra", "../resources/Textures/earthmap1k.jpg", 100, 48);
+// グロバール変数が要る
+let terraData;
+let solData;
+let luaData;
 
-var solData = getPlanetData((1/365.2564) * speedFactor, 0.0009 * speedFactor, 1496000*distanceFactor, "Sol", "../resources/Images/sunmap.jpg", 500, 48);
+// 速度が変化する為に惑星のデータを更新する
+function refreshPlanetData() {
+    terraData = getPlanetData(0 * speedFactor, 1 * speedFactor, 200*2, "Terra", "../resources/Textures/earthmap1k.jpg", 100, 48);
 
-var luaData = getPlanetData(-(1/29.7) * speedFactor, (1/29.7) * speedFactor, 384400*distanceFactor, "Lua", "../resources/Textures/moonmap1k.jpg", 50, 48)
+    solData = getPlanetData((1/365.2564) * speedFactor, 0.0009 * speedFactor, 1496000*distanceFactor, "Sol", "../resources/Images/sunmap.jpg", 500, 48);
+
+    luaData = getPlanetData(-(1/29.7) * speedFactor, (1/29.7) * speedFactor, 384400*distanceFactor, "Lua", "../resources/Textures/moonmap1k.jpg", 50, 48)
+}
+
+// 開始の時惑星ロードする
+refreshPlanetData();
 
 var planets = [];
 
@@ -55,12 +65,39 @@ function main() {
 	camera.lookAt(scene.position);
 }
 
-function update(cameraControl) {
-	cameraControl.update();
 
-    var time = Date.now();
+// 開始時刻
+let count = 0;
+
+// 停止期間
+let isrunning = true;
+let pausetime = 0;
+let pauseoffset = 0; 
+
+function pauseTime() {
+    pausetime = count
+    isrunning = false;
+}
+
+function resumeTime() {
+    pauseoffset = pauseoffset + (count - pausetime)
+    isrunning = true;
+}
+
+function setCount(offset) {
+    count = offset 
+    pauseoffset = 0 
+    pausetime = offset
+    isrunning = false
+}
+
+function update(cameraControl) {
+    if (isrunning) count = count+20
+	cameraControl.update();
+    console.log("count=%d",count)
+
 	planets.forEach(element => {
-		movePlanet(element, time);
+		movePlanet(element, count);
 	});
     renderer.render(scene, camera);
     requestAnimationFrame(function () {
@@ -76,21 +113,20 @@ function moveCamera(terra) {
   }
 
 function movePlanet(myPlanet, myTime) {
-	if(myPlanet[0].name == 'Sol') {
+        if(myPlanet[0].name == 'Sol') {
 
-	}else if (myPlanet[0].name == 'Lua'){
-		myPlanet[0].lookAt(new THREE.Vector3(0,0,0))
-		myPlanet[0].position.x = Math.cos(myTime 
-			* ((myPlanet[1].orbitRate ))) 
-			* myPlanet[1].distanceFromAxis;
+        }else if (myPlanet[0].name == 'Lua'){
+            myPlanet[0].position.x = Math.cos(myTime 
+                * ((myPlanet[1].orbitRate ))) 
+                * myPlanet[1].distanceFromAxis;
 
-		myPlanet[0].position.z = Math.sin(myTime 
-			* ((myPlanet[1].orbitRate )) ) 
-			* myPlanet[1].distanceFromAxis;
-	}else{
-		myPlanet[0].rotateY(myPlanet[1].rotationRate);
-	}
-
+            myPlanet[0].position.z = Math.sin(myTime 
+                * ((myPlanet[1].orbitRate )) ) 
+                * myPlanet[1].distanceFromAxis;
+            myPlanet[0].lookAt(new THREE.Vector3(0,0,0))
+        }else{
+            if (isrunning) myPlanet[0].rotateY(myPlanet[1].rotationRate);
+        }
 }
 
 function loadMesh(planetData) {
@@ -178,12 +214,56 @@ function angleMoonEarth(){
 }
 
 function pauseRotation(){
-	if (speedPause == 1){
-		speedPause = 0;
-	}
-	else{
-		speedPause = 1;
-	}
+    if(isrunning) {
+        pauseTime()
+    }
+    else {
+        resumeTime()
+    }
 }
+
+function setMoonPos(cyclePart) {
+    // 月のサイクルの位置の設定ファンクション
+    // cyclePartとはパーセントで言って
+    // 有効の数字は0,25,50,75しかない
+    if (cyclePart == 0) {
+        console.log("月は新月になる")
+        // ここで月の位置を設定
+        setCount(780)
+    }
+    else if (cyclePart == 25) {
+        console.log("月は上弦になる")
+        // ここで月の位置を設定
+        setCount(9800)
+    }
+    else if (cyclePart == 50) {
+        console.log("月は満月になる")
+        // ここで月の位置を設定
+        setCount(19520)
+    }
+    else if (cyclePart == 75) {
+        console.log("月は下弦になる")
+        // ここで月の位置を設定
+        setCount(29640)
+    }
+    else {
+        console.log("cyclePartの数字とは無効だ！")
+    }
+}
+
+// ボタン
+const buttonpause = document.getElementById('pause')
+const button0moon = document.getElementById('0moon')
+const button25moon = document.getElementById('25moon')
+const button50moon = document.getElementById('50moon')
+const button75moon = document.getElementById('75moon')
+
+// ボタンのイベント
+let func;
+buttonpause.addEventListener(`click`, func = () => {pauseRotation();});
+button0moon.addEventListener(`click`, func = () => {setMoonPos(0);});
+button25moon.addEventListener(`click`, func = () => {setMoonPos(25);});
+button50moon.addEventListener(`click`, func = () => {setMoonPos(50);});
+button75moon.addEventListener(`click`, func = () => {setMoonPos(75);});
 
 main();
