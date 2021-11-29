@@ -43,6 +43,7 @@ Para a construção do jogo foram usadas as seguintes tecnologias:
 - [JavaScript](https://www.javascript.com/)
 - [Three.Js](https://threejs.org/)
 - [THREEAR](https://github.com/JamesLMilner/THREEAR)
+- [Tween.Js](https://github.com/tweenjs/tween.js/)
 
 <a id="como-executar"></a>
 
@@ -67,17 +68,19 @@ Mantenha a câmera na posição correta e manipule o cenário usando o cursor/to
 
 ## :wrench: Relatório técnico
 
-O protótipo foi desenvolvido usando a biblioteca THREEAR, que é uma versão modificada do Three.Js, para a modelagem 3D aplicar a realidade aumentada.
+O protótipo foi desenvolvido usando a biblioteca THREEAR, que é uma versão modificada do Three.Js, para a modelagem 3D aplicar a realidade aumentada e a biblioteca Tween.Js para aplicar alguma animações.
 
 ### Construção da scene
 
-A construção da scene foi feita a partir do uso de uma PerspectiveCamera, AmbientLight e PointLight para simular a luz emitida pelo Sol, OrbitControls para permitir a movimentação da câmera pelo jogador (INSERIR COISA DE AR AQUI) e 3 objetos 3D: Terra, Sol e Lua.
+A construção da scene foi feita a partir do uso de uma PerspectiveCamera, AmbientLight e PointLight para simular a luz emitida pelo Sol, OrbitControls para permitir a movimentação da câmera pelo jogador (INSERIR COISA DE AR AQUI) e três objetos 3D: Terra, Sol e Lua.
 
 ### Objetos 3D
 
+Os objetos foram criados a partir de uma geometria SphereGeometry para gerar um modelo esférico semelhante a um planeta e um MeshPhongMaterial para simular melhor a iluminação e reflexão do corpo celeste, utilizamos texturas de alta resolução para trazer um maior realismo. A rotação e translação da Terra e Lua foram pensados para ser semelhante com o modelo real para manter uma escala.
 
+### Funcionamento do jogo
 
-<a id="como-contribuir"></a>
+Para o funcionamento do jogo foram criados botões referentes às quatro fases da lua, que ao serem pressionados gera uma animação movendo a Lua para a posição responsável por gerar o fenômeno da fase escolhida. Para a criação da animação dos botões foi usada a biblioteca Tween.Js. Dessa forma ao selecionar cada fase da lua o jogador pode observar o motivo da existência desses fenômenos de forma interativa movimentando a câmera .
 
 
 
