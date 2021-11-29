@@ -67,20 +67,17 @@ Mantenha a câmera na posição correta e manipule o cenário usando o cursor/to
 
 ## :wrench: Relatório técnico
 
-O protótipo foi desenvolvido 
+O protótipo foi desenvolvido usando a biblioteca THREEAR, que é uma versão modificada do Three.Js, para a modelagem 3D aplicar a realidade aumentada.
+
+### Construção da scene
+
+A construção da scene foi feita a partir do uso de uma PerspectiveCamera, AmbientLight e PointLight para simular a luz emitida pelo Sol, OrbitControls para permitir a movimentação da câmera pelo jogador (INSERIR COISA DE AR AQUI) e 3 objetos 3D: Terra, Sol e Lua.
+
+### Objetos 3D
+
+
 
 <a id="como-contribuir"></a>
 
-## :recycle: How to contribute
 
-- Fork this repository
-- Create a branch with the name of your feature: `git checkout -b my-feature`
-- Commit your changes: `git commit -m 'feat: My new feature'`
-- Push your branch: `git push origin my-feature`
-
-<a id="licenca"></a>
-
-## :memo: License
-
-This project is under the MIT license. See the file [LICENSE](LICENSE) for more details.
 
