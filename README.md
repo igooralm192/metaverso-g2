@@ -68,7 +68,7 @@ Mantenha a câmera na posição correta e manipule o cenário usando o cursor/to
 
 ## :wrench: Relatório técnico
 
-O protótipo foi desenvolvido usando a biblioteca THREEAR, que é uma versão modificada do Three.Js, para a modelagem 3D aplicar a realidade aumentada e a biblioteca Tween.Js para aplicar alguma animações.
+O protótipo foi desenvolvido utilizando a biblioteca ThreeJS para a construção de objetos 3D, juntamente com a biblioteca THREEAR para aplicar a realidade aumentada e a biblioteca Tween.Js para aplicar animações sobre as fases da Lua.
 
 ### Construção da scene
 
