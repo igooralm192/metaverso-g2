@@ -127,27 +127,6 @@ async function initializeAR(marker) {
   controllerAR.trackMarker(patternMarker);
 }
 
-async function loadGLTF(sceneUrl) {
-  const gltfLoader = new GLTFLoader();
-  const dracoLoader = new DRACOLoader();
-
-  dracoLoader.setDecoderPath("../resources/threejs/examples/js/libs/draco");
-  gltfLoader.setDRACOLoader(dracoLoader);
-
-  return new Promise((resolve, reject) => {
-    gltfLoader.load(
-      sceneUrl,
-      (gltf) => {
-        resolve(gltf);
-      },
-      undefined,
-      function (error) {
-        reject("Erro ao carregar modelo da terra");
-      }
-    );
-  });
-}
-
 async function loadTexture(textureUrl) {
   var textureLoader = new THREE.TextureLoader();
 
@@ -204,8 +183,6 @@ async function loadEarth() {
     map: texture,
     lightMap: texture,
     transparent: true,
-    // opacity: 0.8,
-    // flatShading: THREE.SmoothShading,
   });
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -221,7 +198,6 @@ async function loadEarth() {
 
   terra.name = "Terra";
   terra.position.set(0, 0, 0);
-  // terra.scale.set(terraData.size, terraData.size, terraData.size);
 
   var axisHelper = new THREE.AxesHelper(500);
   terra.add(axisHelper);
@@ -239,8 +215,6 @@ async function loadMoon() {
     map: texture,
     lightMap: texture,
     transparent: true,
-    // opacity: 0.8,
-    //flatShading: THREE.SmoothShading,
   });
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -256,7 +230,6 @@ async function loadMoon() {
 
   lua.name = "Lua";
   lua.position.set(luaData.distanceFromAxis, 0, 0);
-  // lua.scale.set(luaData.size, luaData.size, luaData.size);
 
   var data = [lua, luaData];
   planets.push(data);
@@ -272,7 +245,6 @@ async function main() {
   renderer.setClearColor(new THREE.Color("lightgrey"), 0);
   renderer.setPixelRatio(2);
   renderer.setSize(window.innerWidth, window.innerHeight);
-  // renderer.domElement.style.position = "absolute";
   renderer.domElement.style.top = "0px";
   renderer.domElement.style.left = "0px";
   document.getElementById("WebGL-output").appendChild(renderer.domElement);
@@ -379,7 +351,6 @@ function movePlanet(myPlanet, myTime) {
     myPlanet[0].position.z =
       Math.sin(myTime * myPlanet[1].orbitRate) * myPlanet[1].distanceFromAxis;
   } else {
-    // myPlanet[0].rotateY(myPlanet[1].rotationRate);
     if (isrunning) myPlanet[0].rotateY(myPlanet[1].rotationRate);
   }
 }
@@ -406,31 +377,6 @@ function pauseRotation() {
     resumeTime();
     setButtonStyle("pause", "w3-deep-orange", "w3-sand", "Pause");
     resetAllMoonButtonStyles();
-  }
-}
-
-function setMoonPos(cyclePart) {
-  // 月のサイクルの位置の設定ファンクション
-  // cyclePartとはパーセントで言って
-  // 有効の数字は0,25,50,75しかない
-  if (cyclePart == 0) {
-    console.log("月は新月になる");
-    // ここで月の位置を設定
-    setCount(780);
-  } else if (cyclePart == 25) {
-    console.log("月は上弦になる");
-    // ここで月の位置を設定
-    setCount(9800);
-  } else if (cyclePart == 50) {
-    console.log("月は満月になる");
-    // ここで月の位置を設定
-    setCount(19520);
-  } else if (cyclePart == 75) {
-    console.log("月は下弦になる");
-    // ここで月の位置を設定
-    setCount(29640);
-  } else {
-    console.log("cyclePartの数字とは無効だ！");
   }
 }
 
@@ -489,17 +435,7 @@ function setMoonPosition(phase) {
   tween.start();
 
   requestAnimationFrame(function animate(nowMsec) {
-    // var lua = scene.getObjectByName("Lua");
-    // console.log('Posição da lua x: '+lua.position.x);
-    // console.log('Posição alvo x: '+ pos.x);
-    // console.log('Posição da lua z: '+lua.position.z);
-    // console.log('Posição alvo z: '+ pos.z);
-    // if((Math.round(lua.position.x) < pos.x && Math.round(lua.position.x) > pos.boundx) &&
-    //  (Math.round(lua.position.z) < pos.z && Math.round(lua.position.z) > pos.boundz)) {
-    // 	console.log("ENTROU AQUI!!!!!!!!!!!!!!!!!!!!!!!");
-    // 	pauseRotation();
-    // 	return
-    // }
+
 
     TWEEN.update();
 
@@ -509,9 +445,6 @@ function setMoonPosition(phase) {
 
     renderer.render(scene, camera);
   });
-  // lua.position.set(pos.x, 0, pos.z);
-
-  //ismoving = true;
 }
 
 buttonpause.addEventListener(`click`, () => { pauseRotation(); });
@@ -529,87 +462,3 @@ button75moon.addEventListener(`click`, () => {
 });
 
 main();
-
-/*function angleMoonEarth() {
-	var y = 0;
-	var terra = scene.getObjectByName("Terra")
-	var lua = scene.getObjectByName("Lua")
-
-	var terrap = Math.pow(terra.position.x, 2) + Math.pow(terra.position.y, 2) + Math.pow(terra.position.z, 2)
-	var luap = Math.pow(lua.position.x, 2) + Math.pow(lua.position.y, 2) + Math.pow(lua.position.z, 2)
-	var a = Math.acos(
-		(lua.position.x * terra.position.x +
-			lua.position.y * terra.position.y +
-			lua.position.z * terra.position.z)
-		/ (Math.sqrt(terrap) * Math.sqrt(luap)));
-	//console.log(a);
-}
-function loadMesh(planetData) {
-
-	var textureLoader 	= new THREE.TextureLoader();
-	console.log(planetData);
-	var texture 		= textureLoader.load(planetData.texture, function ( texture ) {
-		texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
-	});
-
-	var material;
-	if(planetData.name == "Sol") {
-		material = new THREE.MeshPhongMaterial({
-			map: texture,
-						lightMap: texture,
-						transparent: true,
-						opacity: 0.8,
-						flatShading: THREE.SmoothShading
-		});
-		texture.wrapS = THREE.ClampToEdgeWrapping;
-			texture.wrapT = THREE.ClampToEdgeWrapping;
-			texture.minFilter = THREE.NearestFilter;
-	}
-	else if (planetData.name == "Terra"){
-		material = new THREE.MeshLambertMaterial({
-			map: texture
-		});
-	} else{
-		material = new THREE.MeshPhongMaterial({map: texture})
-	}
-
-	const geometry = new THREE.SphereGeometry( planetData.size, planetData.size, planetData.size );
-	var planet = new THREE.Mesh( geometry, material );
-
-	planet.castShadow = false;
-	planet.name = planetData.name;
-
-	if(planet.name == "Sol") {
-		let spriteMaterial = new THREE.SpriteMaterial(
-			{
-				map: new THREE.ImageUtils.loadTexture("../resources/Images/glow.png"),
-				color: 0xffffee,
-				transparent: true,
-				blending: THREE.AdditiveBlending
-			});
-		const sunLight = new THREE.PointLight(0xffdcb4, 2.0);
-		let sprite = new THREE.Sprite(spriteMaterial);
-		sprite.scale.set(1800, 1800, 1.0);
-		planet.position.set(planetData.distanceFromAxis, 0, 0);
-		planet.add(sunLight);
-		planet.add(sprite);
-	} else if (planet.name == "Terra"){
-		planet.position.set(0, 0, 0);
-		planet.rotation.set(0, 0.453786, 0)
-		const axis = new THREE.AxesHelper(1000 );
-		planet.add(axis)
-		console.log(planet);
-	}else if (planet.name == "Lua"){
-		var terra = scene.getObjectByName("Terra");
-		planet.position.set(luaData.distanceFromAxis,0, 0);
-		planet.name = luaData.name;
-		const axii = new THREE.AxesHelper(1000);
-		planet.add(axii)
-	}
-	var data = [planet, planetData];
-	planets.push(data);
-	scene.add( planet );
-
-	renderer.clear();
-}
-*/
