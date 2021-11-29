@@ -26,7 +26,7 @@
 - [:framed_picture: Introdução](#framed_picture-introdução)
 - [:rocket: Tecnologias](#rocket-tecnologias)
 - [:boom: Como jogar](#boom-como-jogar)
-- [:wrench: Relatório técnico](#wrench-environment-variables)
+- [:wrench: Relatório técnico](#wrench-relatório-técnico)
 
 <a id="layout"></a>
 
