@@ -28,7 +28,7 @@ function refreshPlanetData() {
     -1 * speedFactor,
     200 * 2,
     "Terra",
-    "../resources/Textures/earthmap1k.jpg",
+    "resources/Textures/earthmap1k.jpg",
     50,
     360
   );
@@ -38,7 +38,7 @@ function refreshPlanetData() {
     0.0009 * speedFactor,
     149600 * distanceFactor,
     "Sol",
-    "../resources/Images/sunmap.jpg",
+    "resources/Images/sunmap.jpg",
     90,
     360
   );
@@ -48,7 +48,7 @@ function refreshPlanetData() {
     (-1 / 29.7) * speedFactor,
     38440 * distanceFactor,
     "Lua",
-    "../resources/Textures/moonmap1k.jpg",
+    "resources/Textures/moonmap1k.jpg",
     25,
     360
   );
@@ -131,7 +131,7 @@ async function loadGLTF(sceneUrl) {
   const gltfLoader = new GLTFLoader();
   const dracoLoader = new DRACOLoader();
 
-  dracoLoader.setDecoderPath("../resources/threejs/examples/js/libs/draco");
+  dracoLoader.setDecoderPath("resources/threejs/examples/js/libs/draco");
   gltfLoader.setDRACOLoader(dracoLoader);
 
   return new Promise((resolve, reject) => {
@@ -161,7 +161,7 @@ async function loadTexture(textureUrl) {
 }
 
 async function loadSun() {
-  var texture = await loadTexture("../resources/Textures/sunmap.jpg");
+  var texture = await loadTexture("resources/Textures/sunmap.jpg");
 
   var material = new THREE.MeshPhongMaterial({
     map: texture,
@@ -198,7 +198,7 @@ async function loadSun() {
 }
 
 async function loadEarth() {
-  var texture = await loadTexture("../resources/Images/earthtexture.jpg");
+  var texture = await loadTexture("resources/Images/earthtexture.jpg");
 
   var material = new THREE.MeshPhongMaterial({
     map: texture,
@@ -233,7 +233,7 @@ async function loadEarth() {
 }
 
 async function loadMoon() {
-	var texture = await loadTexture("../resources/Textures/moonmap1k.jpg");
+	var texture = await loadTexture("resources/Textures/moonmap1k.jpg");
 
   var material = new THREE.MeshPhongMaterial({
     map: texture,
