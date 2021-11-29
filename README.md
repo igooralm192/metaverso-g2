@@ -72,7 +72,7 @@ O protótipo foi desenvolvido usando a biblioteca THREEAR, que é uma versão mo
 
 ### Construção da scene
 
-A construção da scene foi feita a partir do uso de uma PerspectiveCamera, AmbientLight e PointLight para simular a luz emitida pelo Sol, OrbitControls para permitir a movimentação da câmera pelo jogador (INSERIR COISA DE AR AQUI) e três objetos 3D: Terra, Sol e Lua.
+A construção da scene foi feita a partir do uso de uma PerspectiveCamera, PointLight para simular a luz emitida pelo Sol, OrbitControls para permitir a movimentação da câmera pelo jogador (INSERIR COISA DE AR AQUI) e três objetos 3D: Terra, Sol e Lua.
 
 ### Objetos 3D
 
