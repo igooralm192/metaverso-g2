@@ -2,8 +2,6 @@
 
 // import * as THREE from '../resources/threejs/build/three.module.js';
 import { OrbitControls } from "../resources/threejs/examples/jsm/controls/OrbitControls.js";
-import { GLTFLoader } from "../resources/threejs/examples/jsm/loaders/GLTFLoader.js";
-import { DRACOLoader } from "../resources/threejs/examples/jsm/loaders/DRACOLoader.js";
 
 var renderer;
 var scene;
@@ -14,14 +12,12 @@ var markerGroup;
 var controllerAR;
 var speedFactor = 0.005;
 var distanceFactor = 0.005;
+var planets = [];
 
-// グロバール変数が要る
 let terraData;
 let solData;
 let luaData;
 
-// 速度が変化する為に惑星のデータを更新する
-//
 function refreshPlanetData() {
   terraData = getPlanetData(
     0 * speedFactor,
@@ -54,7 +50,6 @@ function refreshPlanetData() {
   );
 }
 
-// 開始の時惑星ロードする
 refreshPlanetData();
 
 const luaFases = [
@@ -88,7 +83,6 @@ const luaFases = [
   },
 ];
 
-var planets = [];
 
 function getPlanetData(
   myOrbitRate,
@@ -145,9 +139,6 @@ async function loadSun() {
   var material = new THREE.MeshPhongMaterial({
     map: texture,
     lightMap: texture,
-    transparent: true,
-    opacity: 0.8,
-    flatShading: THREE.SmoothShading,
   });
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -161,18 +152,16 @@ async function loadSun() {
   );
   var sun = new THREE.Mesh(geometry, material);
 
-  const sunLight = new THREE.PointLight(0xffdcb4, 2.5);
+  const sunLight = new THREE.PointLight(0xffdcb4, 3.5);
   sun.add(sunLight);
   sun.position.set(solData.distanceFromAxis, 0, 0);
 
   sun.castShadow = false;
   sun.name = "Sol";
-  var axisHelper = new THREE.AxesHelper(500);
-  sun.add(axisHelper);
-  console.log("Sol: ", sun);
 
   var data = [sun, solData];
   planets.push(data);
+
   markerGroup.add(sun);
 }
 
@@ -182,7 +171,6 @@ async function loadEarth() {
   var material = new THREE.MeshPhongMaterial({
     map: texture,
     lightMap: texture,
-    transparent: true,
   });
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -199,9 +187,6 @@ async function loadEarth() {
   terra.name = "Terra";
   terra.position.set(0, 0, 0);
 
-  var axisHelper = new THREE.AxesHelper(500);
-  terra.add(axisHelper);
-
   var data = [terra, terraData];
   planets.push(data);
 
@@ -214,7 +199,6 @@ async function loadMoon() {
   var material = new THREE.MeshPhongMaterial({
     map: texture,
     lightMap: texture,
-    transparent: true,
   });
 
   texture.wrapS = THREE.ClampToEdgeWrapping;
@@ -233,7 +217,6 @@ async function loadMoon() {
 
   var data = [lua, luaData];
   planets.push(data);
-  console.log("LUA", lua);
 
 	markerGroup.add(lua);
 }
@@ -248,14 +231,15 @@ async function main() {
   renderer.domElement.style.top = "0px";
   renderer.domElement.style.left = "0px";
   document.getElementById("WebGL-output").appendChild(renderer.domElement);
-  const ambLight = new THREE.AmbientLight(0xffffff, 0.1);
-  ambLight.name = "ambLight";
-  ambLight.visible = true;
-  scene.add(ambLight);
+
+  // const ambLight = new THREE.AmbientLight(0xffffff, 0.1);
+  // ambLight.name = "ambLight";
+  // ambLight.visible = true;
+  // scene.add(ambLight);
 
   camera = new THREE.PerspectiveCamera(
     45,
-    window.innerWidth / window.innerHeight,
+    window.innerWidth / window.innerWidth,
     0.1,
     10000
   );
@@ -277,25 +261,17 @@ async function main() {
 	camera.far = 100000
 	camera.updateProjectionMatrix()
 
-  //loadMesh(terraData);
-  //loadMesh(luaData);
   animateFrame(cameraControl);
+
   var terra = scene.getObjectByName("Terra");
-  console.log(terra);
   moveCamera(terra);
-  //var terra = planets[1];
   camera.lookAt(scene.position);
 }
 
-// 開始時刻
 let count = 0;
-
-// 停止期間
 let isrunning = true;
 let pausetime = 0;
 let pauseoffset = 0;
-let ismoving = false;
-let currentPhase = null;
 
 function pauseTime() {
   pausetime = count;
@@ -337,6 +313,9 @@ function moveCamera(terra) {
   camera.position.x = terra.position.x + 0;
   camera.position.y = terra.position.y + 400;
   camera.position.z = terra.position.z + 1800;
+  camera.rotation.z = 90 * Math.PI /180
+  camera.updateProjectionMatrix()
+  cameraControl.update();
   camera.lookAt(terra.position);
 }
 
@@ -380,7 +359,6 @@ function pauseRotation() {
   }
 }
 
-// ボタン
 const buttonpause = document.getElementById("pause");
 const button0moon = document.getElementById("0moon");
 const button25moon = document.getElementById("25moon");
@@ -425,7 +403,6 @@ function setMoonPosition(phase) {
   var tween = new TWEEN.Tween(position).to(target, 2000);
 
   tween.onUpdate(function (obj) {
-    console.log(obj);
     lua.position.set(position.x, 0, position.z);
     if (isrunning) {
       pauseRotation();
@@ -435,14 +412,11 @@ function setMoonPosition(phase) {
   tween.start();
 
   requestAnimationFrame(function animate(nowMsec) {
-
-
     TWEEN.update();
 
     requestAnimationFrame(animate);
 
     cameraControl.update();
-
     renderer.render(scene, camera);
   });
 }
