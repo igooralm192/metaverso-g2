@@ -1,4 +1,3 @@
-// Mapeamento de Texturas
 
 // import * as THREE from '../resources/threejs/build/three.module.js';
 import { OrbitControls } from "../resources/threejs/examples/jsm/controls/OrbitControls.js";
@@ -17,6 +16,30 @@ var planets = [];
 let terraData;
 let solData;
 let luaData;
+
+// Função que retorna os dados de um corpo celeste
+
+function getPlanetData(
+  myOrbitRate,
+  myRotationRate,
+  myDistanceFromAxis,
+  myName,
+  myTexture,
+  mySize,
+  mySegments
+) {
+  return {
+    orbitRate: myOrbitRate,
+    rotationRate: myRotationRate,
+    distanceFromAxis: myDistanceFromAxis,
+    name: myName,
+    texture: myTexture,
+    size: mySize,
+    segments: mySegments,
+  };
+}
+
+// Função que usa o getPlanetData para criar guardar os dados dos corpos celestes nas variáveis terraData, solData e luaData
 
 function refreshPlanetData() {
   terraData = getPlanetData(
@@ -52,6 +75,8 @@ function refreshPlanetData() {
 
 refreshPlanetData();
 
+// Array resposável por guardar as informações de posição de cada fase da lua
+
 const luaFases = [
   // Crescente
   {
@@ -83,26 +108,9 @@ const luaFases = [
   },
 ];
 
+// Para o melhor carregamento das texturas, já que são relativamente pesadas, utilizamos funções assincronas
 
-function getPlanetData(
-  myOrbitRate,
-  myRotationRate,
-  myDistanceFromAxis,
-  myName,
-  myTexture,
-  mySize,
-  mySegments
-) {
-  return {
-    orbitRate: myOrbitRate,
-    rotationRate: myRotationRate,
-    distanceFromAxis: myDistanceFromAxis,
-    name: myName,
-    texture: myTexture,
-    size: mySize,
-    segments: mySegments,
-  };
-}
+// Função para inicializar o marker
 
 async function initializeAR(marker) {
   controllerAR = await THREEAR.initialize({
@@ -121,6 +129,8 @@ async function initializeAR(marker) {
   controllerAR.trackMarker(patternMarker);
 }
 
+// Função de carregar texturas
+
 async function loadTexture(textureUrl) {
   var textureLoader = new THREE.TextureLoader();
 
@@ -132,6 +142,8 @@ async function loadTexture(textureUrl) {
     resolve(texture);
   });
 }
+
+// Função responsável pelo carregamento do Mesh do Sol
 
 async function loadSun() {
   var texture = await loadTexture("resources/Textures/sunmap.jpg");
@@ -165,6 +177,8 @@ async function loadSun() {
   markerGroup.add(sun);
 }
 
+// Função responsável pelo carregamento do Mesh da Terra
+
 async function loadEarth() {
   var texture = await loadTexture("resources/Images/earthtexture.jpg");
 
@@ -192,6 +206,8 @@ async function loadEarth() {
 
   markerGroup.add(terra);
 }
+
+// Função responsável pelo carregamento do Mesh da Lua
 
 async function loadMoon() {
 	var texture = await loadTexture("resources/Textures/moonmap1k.jpg");
@@ -221,6 +237,8 @@ async function loadMoon() {
 	markerGroup.add(lua);
 }
 
+// Onde criamos as primeiras configurações sobre o Scene AR e movimentação de câmera
+
 async function main() {
   scene = new THREE.Scene();
   renderer = new THREE.WebGLRenderer({ alpha: true });
@@ -232,11 +250,6 @@ async function main() {
   renderer.domElement.style.left = "0px";
   document.getElementById("WebGL-output").appendChild(renderer.domElement);
 
-  // const ambLight = new THREE.AmbientLight(0xffffff, 0.1);
-  // ambLight.name = "ambLight";
-  // ambLight.visible = true;
-  // scene.add(ambLight);
-
   camera = new THREE.PerspectiveCamera(
     45,
     window.innerWidth / window.innerWidth,
@@ -245,8 +258,6 @@ async function main() {
   );
 
   cameraControl = new OrbitControls(camera, renderer.domElement);
-
-  // Create THREEAR source
   source = new THREEAR.Source({ renderer, camera });
 
   markerGroup = new THREE.Group();
@@ -273,6 +284,8 @@ let isrunning = true;
 let pausetime = 0;
 let pauseoffset = 0;
 
+// Funções para controle da animação de rotação e translação
+
 function pauseTime() {
   pausetime = count;
   isrunning = false;
@@ -284,15 +297,8 @@ function resumeTime() {
   isrunning = true;
 }
 
-function setCount(offset) {
-  count = offset;
-  pauseoffset = 0;
-  pausetime = offset;
-  isrunning = false;
-}
-
 function animateFrame(cameraControl) {
-  requestAnimationFrame(function animate(nowMsec) {
+  requestAnimationFrame(function animate() {
     controllerAR.update(source.domElement);
 
     if (isrunning) count = count + 20;
@@ -309,6 +315,8 @@ function animateFrame(cameraControl) {
   });
 }
 
+// Função de inicialização da primeira posição da câmera, apontando para a Terra
+
 function moveCamera(terra) {
   camera.position.x = terra.position.x + 0;
   camera.position.y = terra.position.y + 400;
@@ -318,6 +326,8 @@ function moveCamera(terra) {
   cameraControl.update();
   camera.lookAt(terra.position);
 }
+
+// Função responsável por lidar com a translação e rotação da Lua, que se move em função do tempo em um formato circular
 
 function movePlanet(myPlanet, myTime) {
   if (myPlanet[0].name == "Sol") {
@@ -334,6 +344,8 @@ function movePlanet(myPlanet, myTime) {
   }
 }
 
+// Funções de estilo do botão
+
 function setButtonStyle(button, oldClass, newClass, newText) {
   document.getElementById(button).classList.remove(oldClass);
   document.getElementById(button).classList.add(newClass);
@@ -346,6 +358,8 @@ function resetAllMoonButtonStyles() {
   setButtonStyle("50moon", "w3-deep-orange", "w3-blue-grey");
   setButtonStyle("75moon", "w3-deep-orange", "w3-dark-grey");
 }
+
+// Função para executar o pause
 
 function pauseRotation() {
   if (isrunning) {
@@ -364,6 +378,9 @@ const button0moon = document.getElementById("0moon");
 const button25moon = document.getElementById("25moon");
 const button50moon = document.getElementById("50moon");
 const button75moon = document.getElementById("75moon");
+
+
+// Função que usa o Tween.Js para realizar as animações dos 4 botões de posição da Lua
 
 function setMoonPosition(phase) {
   let index;
@@ -411,7 +428,7 @@ function setMoonPosition(phase) {
 
   tween.start();
 
-  requestAnimationFrame(function animate(nowMsec) {
+  requestAnimationFrame(function animate() {
     TWEEN.update();
 
     requestAnimationFrame(animate);
